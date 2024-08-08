@@ -65,6 +65,8 @@ const AddPatient = async (req, res ) => {
 
       checkfield(requiredFields,req);
 
+      req.body
+
       const response = await db.collection('patients').doc(req.body.HN).create(req.body);
 
       res.status(200).send('success');
