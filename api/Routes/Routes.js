@@ -22,8 +22,17 @@ const upload = multer({
         }
       });
 
+
+
 router.post('/patients/create', formController.AddPatient);
+router.put('/patients/update', formController.EditPatient);
 router.get('/patients/get',formController.FindPatient);
+router.delete('/patients/delete', formController.DelPatient);
+
+router.post('/patients/record', formController.AddRecord);
+router.put('/patients/record', formController.EditRecord);
+router.get('/patients/', formController.GetRecord);
+router.delete('/patients/record', formController.DelRecord);
 
 
 router.post('/users/register', userController.create);

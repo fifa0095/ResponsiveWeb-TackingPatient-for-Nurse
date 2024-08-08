@@ -1,22 +1,45 @@
-const  { db } = require('../config_db/firebaseConfig');
+const  { db, admin } = require('../config_db/firebaseConfig');
 const crypto = require('crypto');
-
+const Timestamp = admin.firestore.Timestamp;
 
 const multer = require('multer');
 
-const firestoreTimestampToDate = (firestoreTimestamp) => {
-  // Create a JavaScript Date object using the seconds and milliseconds
-  const milliseconds = firestoreTimestamp._seconds * 1000 + firestoreTimestamp._nanoseconds / 1000000;
-  return new Date(milliseconds);
+const firestoreTimestampToDateInUTCPlus7 = (firestoreTimestamp, returnFormat = 'DOB') => {
+  // Convert Firestore Timestamp to JavaScript Date (in UTC)
+  const utcDate = firestoreTimestamp.toDate();
+
+  if (returnFormat === 'noplus') {
+    // Return as UTC date in 'YYYY-MM-DD' format without adjustment
+    return new Date(utcDate.getTime());
+  } else if (returnFormat === 'DOB') {
+    // Convert UTC Date to UTC+7 by adding 7 hours (7 * 60 * 60 * 1000 milliseconds)
+    const offsetMilliseconds = 7 * 60 * 60 * 1000; // 7 hours in milliseconds
+    const utcPlus7Date = new Date(utcDate.getTime() + offsetMilliseconds);
+
+    // Return as 'YYYY-MM-DD'
+    const year = utcPlus7Date.getFullYear();
+    const month = String(utcPlus7Date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+    const day = String(utcPlus7Date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  } else {
+    // Return as full Date object (with time) in UTC+7 if not 'noplus' or 'DOB'
+    const offsetMilliseconds = 7 * 60 * 60 * 1000; // 7 hours in milliseconds
+    const utcPlus7Date = new Date(utcDate.getTime() + offsetMilliseconds);
+    return utcPlus7Date;
+  }
 };
 
-const dateToFirestoreTimestamp = (date) => {
-  // Get the milliseconds since the epoch
-  const milliseconds = date.getTime();
-  // Convert milliseconds to seconds and nanoseconds
-  const seconds = Math.floor(milliseconds / 1000);
-  const nanoseconds = (milliseconds % 1000) * 1000000;
-  return { _seconds: seconds, _nanoseconds: nanoseconds };
+
+const dateToFirestoreTimestamp = (dateString) => {
+  // Parse the YYYY-MM-DD string to a JavaScript Date object
+  const [year, month, day] = dateString.split('-').map(Number);
+  const date = new Date(year, month - 1, day); // Months are 0-based in Date
+
+  // Convert from UTC+7 to UTC by subtracting 7 hours
+  const utcDate = new Date(date.getTime() - (7 * 60 * 60 * 1000));
+
+  // Create Firestore Timestamp from JavaScript Date
+  return Timestamp.fromDate(date);
 };
 
 // const { Storage } = require('@google-cloud/storage');
@@ -65,7 +88,8 @@ const AddPatient = async (req, res ) => {
 
       checkfield(requiredFields,req);
 
-      req.body
+      const firestoreTimestamp = dateToFirestoreTimestamp(req.body.DOB);
+      req.body.DOB = firestoreTimestamp;
 
       const response = await db.collection('patients').doc(req.body.HN).create(req.body);
 
@@ -88,6 +112,9 @@ const EditPatient = async (req, res ) => {
       ];
 
       checkfield(requiredFields,req);
+
+      const firestoreTimestamp = dateToFirestoreTimestamp(req.body.DOB);
+      req.body.DOB = firestoreTimestamp;
 
       const response = await db.collection('patients').doc(req.body.HN).update(req.body);
 
@@ -118,7 +145,7 @@ const FindPatient = async (req, res) => {
       const data = doc.data();
       // Convert Firestore timestamp fields to JavaScript Date
       if (data.DOB) {
-        data.DOB = firestoreTimestampToDate(data.DOB);
+        data.DOB = firestoreTimestampToDateInUTCPlus7(data.DOB, 'DOB');
       }
       patients.push({ id: doc.id, ...data });
     });
@@ -142,13 +169,58 @@ const DelPatient = async (req, res ) => {
 
 
 // Add new record
-const AddRecord = async (req, res ) => {
+const AddRecord = async (req, res) => {
   try {
-      
+    const requiredFields = [
+      'HN',                    // Hospital Number
+      'BT',                    // Body Temperature: "ไม่มีไข้", "ไข้ต่ำ", "ไข้สูง"
+      'BP',                    // Blood Pressure: "ปกติ", "ต่ำ", "สูง"
+      'HR',                    // Heart Rate: "ปกติ", "ช้า", "เร็ว"
+      'RR',                    // Respiratory Rate: "ปกติ", "ช้า", "เร็ว"
+      'O2sat',                 // Oxygen Saturation: "ปกติ", "ต่ำ"
+      'conscious',             // Level of Consciousness: "ตื่น รู้สึกตัวดี", "หลับ", "ซึม", "สับสน", "ไม่รู้สึกตัว"
+      'breath_pattern',        // Breathing Pattern: "หายใจปกติ", "หายใจช้า", "หายใจเร็ว หายใจหอบเหนื่อย"
+      'eat_method',            // Eating Method: "รับประทานเองได้", "ใส่สายยางให้อาหาร"
+      'food_type',             // Food Type: "นมแม่", "นมผสม", "อาหารปกติ", "อาหารอ่อน", "อาหารเหลว"
+      'food_intake',           // Food Intake (multiple choice): should be an array
+      'sleep',                 // Sleep Pattern: "นอนหลับได้", "หลับๆตื่นๆ", "นอนไม่หลับ"
+      'excretion',             // Excretion: "ดี", "ไม่ดี"
+    ];
+
+    checkfield(requiredFields, req);
+
+    const current_time = Timestamp.now();
+    const recordData = {
+      timestamp: current_time,
+      BT: req.body.BT,
+      BP: req.body.BP,
+      HR: req.body.HR,
+      RR: req.body.RR,
+      O2sat: req.body.O2sat,
+      conscious: req.body.conscious,
+      breath_pattern: req.body.breath_pattern,
+      extra_symptoms: req.body.extra_symptoms ? req.body.extra_symptoms : null , // Additional symptoms (text input)
+      eat_method: req.body.eat_method,
+      food_type: req.body.food_type,
+      extra_food: req.body.extra_food ? req.body.extra_food : null, // Additional food info (text input)
+      food_intake: req.body.food_intake, // Array of strings
+      sleep: req.body.sleep,
+      excretion: req.body.excretion,
+      notes: req.body.notes ? req.body.notes : null // Additional notes (text input)
+    }; 
+    
+    const docId = `rec_${firestoreTimestampToDateInUTCPlus7(current_time, "noplus")}`;
+    // const docId = `rec_${current_time}`;
+
+    await db.collection('patients').doc(req.body.HN).collection('records').doc(docId).set(recordData);
+
+    res.status(200).send('Record added successfully');
   } catch (error) {
     res.status(500).send(error.message);
   }
 }
+
+
 
 // edit record
 const EditRecord = async (req, res ) => {
@@ -185,4 +257,6 @@ const GetRecord = async (req, res ) => {
 //     res.status(500).send(error.message);
 //   }
 // }
-module.exports = { AddPatient, EditPatient, FindPatient };
+module.exports = { AddPatient, EditPatient, FindPatient , DelPatient ,
+                    AddRecord, EditRecord, DelRecord, GetRecord
+};

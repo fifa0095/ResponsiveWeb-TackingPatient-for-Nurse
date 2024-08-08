@@ -91,8 +91,71 @@
  *               example: Error message
  */
 
-
 // edit patient info
+/**
+ * @swagger
+ * /api/v1/patients/update:
+ *   put:
+ *     summary: Edit an existing patient
+ *     description: Updates an existing patient record in the database with the provided details. The date of birth (DOB) must be in "YYYY-MM-DD" format.
+ *     tags:
+ *       - Patients
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               HN:
+ *                 type: string
+ *                 description: Hospital Number (HN) of the patient.
+ *                 example: '12345'
+ *               prefix:
+ *                 type: string
+ *                 description: Prefix of the patient's name (e.g., Mr., Mrs.).
+ *                 example: 'Mr.'
+ *               name:
+ *                 type: string
+ *                 description: First name of the patient.
+ *                 example: 'John'
+ *               surname:
+ *                 type: string
+ *                 description: Surname of the patient.
+ *                 example: 'Doe'
+ *               gender:
+ *                 type: string
+ *                 description: Gender of the patient.
+ *                 example: 'Male'
+ *               DOB:
+ *                 type: string
+ *                 format: date
+ *                 description: Date of birth of the patient, must be in "YYYY-MM-DD" format.
+ *                 example: '1990-01-01'
+ *             required:
+ *               - HN
+ *               - prefix
+ *               - name
+ *               - surname
+ *               - gender
+ *               - DOB
+ *     responses:
+ *       200:
+ *         description: Patient updated successfully
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: success
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: Error message
+ */
+
 
 // get patient info and can search
 /**
@@ -165,7 +228,140 @@
  *               example: Error message
  */
 
-// ------- PATIENTS SECTION -------------------------------------- //
+// ------- RECORDS SECTION -------------------------------------- //
+
+// Add new record
+/**
+ * @swagger
+ * /api/v1/patients/record:
+ *   post:
+ *     summary: Add a new patient record
+ *     description: Creates a new patient record with the provided details, including vital signs, consciousness level, breathing pattern, eating method, and more.
+ *     tags:
+ *       - Records
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               HN:
+ *                 type: string
+ *                 description: Hospital Number (HN) of the patient.
+ *                 example: '12345'
+ *               BT:
+ *                 type: string
+ *                 description: Body Temperature.
+ *                 enum: ["ไม่มีไข้", "ไข้ต่ำ", "ไข้สูง"]
+ *                 example: "ไม่มีไข้"
+ *               BP:
+ *                 type: string
+ *                 description: Blood Pressure.
+ *                 enum: ["ปกติ", "ต่ำ", "สูง"]
+ *                 example: "ปกติ"
+ *               HR:
+ *                 type: string
+ *                 description: Heart Rate.
+ *                 enum: ["ปกติ", "ช้า", "เร็ว"]
+ *                 example: "ปกติ"
+ *               RR:
+ *                 type: string
+ *                 description: Respiratory Rate.
+ *                 enum: ["ปกติ", "ช้า", "เร็ว"]
+ *                 example: "ปกติ"
+ *               O2sat:
+ *                 type: string
+ *                 description: Oxygen Saturation.
+ *                 enum: ["ปกติ", "ต่ำ"]
+ *                 example: "ปกติ"
+ *               conscious:
+ *                 type: string
+ *                 description: Level of Consciousness.
+ *                 enum: ["ตื่น รู้สึกตัวดี", "หลับ", "ซึม", "สับสน", "ไม่รู้สึกตัว"]
+ *                 example: "ตื่น รู้สึกตัวดี"
+ *               breath_pattern:
+ *                 type: string
+ *                 description: Breathing Pattern.
+ *                 enum: ["หายใจปกติ", "หายใจช้า", "หายใจเร็ว หายใจหอบเหนื่อย"]
+ *                 example: "หายใจปกติ"
+ *               extra_symptoms:
+ *                 type: string
+ *                 description: Additional symptoms (optional).
+ *                 example: "มีไข้, ไอ"
+ *               eat_method:
+ *                 type: string
+ *                 description: Eating Method.
+ *                 enum: ["รับประทานเองได้", "ใส่สายยางให้อาหาร"]
+ *                 example: "รับประทานเองได้"
+ *               food_type:
+ *                 type: string
+ *                 description: Food Type.
+ *                 enum: ["นมแม่", "นมผสม", "อาหารปกติ", "อาหารอ่อน", "อาหารเหลว"]
+ *                 example: "อาหารปกติ"
+ *               extra_food:
+ *                 type: string
+ *                 description: Additional food information (optional).
+ *                 example: "ผักบด"
+ *               food_intake:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: Food Intake (multiple choice).
+ *                 example: ["ข้าว", "ผลไม้"]
+ *               sleep:
+ *                 type: string
+ *                 description: Sleep Pattern.
+ *                 enum: ["นอนหลับได้", "หลับๆตื่นๆ", "นอนไม่หลับ"]
+ *                 example: "นอนหลับได้"
+ *               excretion:
+ *                 type: string
+ *                 description: Excretion.
+ *                 enum: ["ดี", "ไม่ดี"]
+ *                 example: "ดี"
+ *               notes:
+ *                 type: string
+ *                 description: Additional notes (optional).
+ *                 example: "ไม่มีอาการผิดปกติ"
+ *             required:
+ *               - HN
+ *               - BT
+ *               - BP
+ *               - HR
+ *               - RR
+ *               - O2sat
+ *               - conscious
+ *               - breath_pattern
+ *               - eat_method
+ *               - food_type
+ *               - food_intake
+ *               - sleep
+ *               - excretion
+ *     responses:
+ *       200:
+ *         description: Record added successfully
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: success
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: Error message
+ */
+
+// edit record
+
+
+// delete record
+
+
+// get all records
+
 
 // ------- USERS SECTION -------------------------------------- //
 
