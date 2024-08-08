@@ -22,7 +22,8 @@ const upload = multer({
         }
       });
 
-router.get('/pateints/get',formController.FindPatient);
+router.post('/patients/create', formController.AddPatient);
+router.get('/patients/get',formController.FindPatient);
 
 
 router.post('/users/register', userController.create);

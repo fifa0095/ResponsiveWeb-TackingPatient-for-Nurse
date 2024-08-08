@@ -24,16 +24,80 @@
  *                   example: 'Example endpoint'
  */
 
-// ------- FORM SECTION -------------------------------------- //
+// ------- PATIENTS SECTION -------------------------------------- //
 
 // create new patient info
+/**
+ * @swagger
+ * /api/v1/patients/create:
+ *   post:
+ *     summary: Add a new patient
+ *     description: Creates a new patient record in the database with the provided details.
+ *     tags:
+ *       - Patients
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               HN:
+ *                 type: string
+ *                 description: Hospital Number (HN) of the patient.
+ *                 example: '12345'
+ *               prefix:
+ *                 type: string
+ *                 description: Prefix of the patient's name (e.g., Mr., Mrs.).
+ *                 example: 'Mr.'
+ *               name:
+ *                 type: string
+ *                 description: First name of the patient.
+ *                 example: 'John'
+ *               surname:
+ *                 type: string
+ *                 description: Surname of the patient.
+ *                 example: 'Doe'
+ *               gender:
+ *                 type: string
+ *                 description: Gender of the patient.
+ *                 example: 'Male'
+ *               DOB:
+ *                 type: string
+ *                 format: date
+ *                 description: Date of birth of the patient.
+ *                 example: '1990-01-01'
+ *             required:
+ *               - HN
+ *               - prefix
+ *               - name
+ *               - surname
+ *               - gender
+ *               - DOB
+ *     responses:
+ *       200:
+ *         description: Patient added successfully
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: success
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: Error message
+ */
+
 
 // edit patient info
 
 // get patient info and can search
 /**
  * @swagger
- * /api/v1/pateints/get:
+ * /api/v1/patients/get:
  *   get:
  *     summary: Find patients based on Hospital Number (HN)
  *     description: Retrieves a list of patients based on the HN query parameter. If HN is not provided, the latest updated patients are returned.
@@ -101,7 +165,7 @@
  *               example: Error message
  */
 
-
+// ------- PATIENTS SECTION -------------------------------------- //
 
 // ------- USERS SECTION -------------------------------------- //
 
