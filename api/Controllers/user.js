@@ -102,7 +102,20 @@ const edit = async (req, res) => {
 
 //delete user
 const del = async (req, res) => {
-    
+  try {
+    const requiredFields = [
+      'username',
+      'password' 
+    ];
+    checkfield(requiredFields, req);
+
+    await db.collection('users').where("username","==",req.body.username)
+    .where("password","==",hashData(req.body.password)).delete();
+    res.status(200).send("delete success");
+
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
 }
 
-module.exports = { create , login};
+module.exports = { create , login , edit , del};

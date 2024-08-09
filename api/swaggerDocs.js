@@ -1,28 +1,5 @@
-/**
- * @swagger
- * tags:
- *   name: Examples
- *   description: API for examples
- */
 
-/**
- * @swagger
- * /api/example:
- *   get:
- *     summary: Returns an example response
- *     tags: [Examples]
- *     responses:
- *       200:
- *         description: Example response
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: 'Example endpoint'
- */
+
 
 // ------- PATIENTS SECTION -------------------------------------- //
 
@@ -45,7 +22,7 @@
  *               HN:
  *                 type: string
  *                 description: Hospital Number (HN) of the patient.
- *                 example: '12345'
+ *                 example: 'AI12345'
  *               prefix:
  *                 type: string
  *                 description: Prefix of the patient's name (e.g., Mr., Mrs.).
@@ -156,7 +133,6 @@
  *               example: Error message
  */
 
-
 // get patient info and can search
 /**
  * @swagger
@@ -228,6 +204,36 @@
  *               example: Error message
  */
 
+// delete patient info
+/**
+ * @swagger
+ * /api/v1/patients/delete:
+ *   delete:
+ *     summary: Delete a patient's infomation
+ *     description: Delete an existing document from a patient's infomation collection using the Hospital Number (HN).
+ *     tags:
+ *       - Patients
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               HN:
+ *                 type: string
+ *                 description: Hospital Number (HN) of the patient.
+ *                 example: 'AI12345'
+ *             required:
+ *               - HN
+ *     responses:
+ *       200:
+ *         description: Record deleted successfully.
+ *       500:
+ *         description: Internal server error.
+ */
+
+
 // ------- RECORDS SECTION -------------------------------------- //
 
 // Add new record
@@ -236,7 +242,7 @@
  * /api/v1/patients/record:
  *   post:
  *     summary: Add a new patient record
- *     description: Creates a new patient record with the provided details, including vital signs, consciousness level, breathing pattern, eating method, and more.
+ *     description: Creates a new patient record with the provided details. 
  *     tags:
  *       - Records
  *     requestBody:
@@ -249,7 +255,169 @@
  *               HN:
  *                 type: string
  *                 description: Hospital Number (HN) of the patient.
- *                 example: '12345'
+ *                 example: 'AI12345'
+ *               BT:
+ *                 type: string
+ *                 description: |
+ *                   Body Temperature. Possible values:
+ *                   - ไม่มีไข้
+ *                   - ไข้ต่ำ
+ *                   - ไข้สูง
+ *                 example: "ไม่มีไข้"
+ *               BP:
+ *                 type: string
+ *                 description: |
+ *                   Blood Pressure. Possible values:
+ *                   - ปกติ
+ *                   - ต่ำ
+ *                   - สูง
+ *                 example: "ปกติ"
+ *               HR:
+ *                 type: string
+ *                 description: |
+ *                   Heart Rate. Possible values:
+ *                   - ปกติ
+ *                   - ช้า
+ *                   - เร็ว
+ *                 example: "ปกติ"
+ *               RR:
+ *                 type: string
+ *                 description: |
+ *                   Respiratory Rate. Possible values:
+ *                   - ปกติ
+ *                   - ช้า
+ *                   - เร็ว
+ *                 example: "ปกติ"
+ *               O2sat:
+ *                 type: string
+ *                 description: |
+ *                   Oxygen Saturation. Possible values:
+ *                   - ปกติ
+ *                   - ต่ำ
+ *                 example: "ปกติ"
+ *               conscious:
+ *                 type: string
+ *                 description: |
+ *                   Level of Consciousness. Possible values:
+ *                   - ตื่น รู้สึกตัวดี
+ *                   - หลับ
+ *                   - ซึม
+ *                   - สับสน
+ *                   - ไม่รู้สึกตัว
+ *                 example: "ตื่น รู้สึกตัวดี"
+ *               breath_pattern:
+ *                 type: string
+ *                 description: |
+ *                   Breathing Pattern. Possible values:
+ *                   - หายใจปกติ
+ *                   - หายใจช้า
+ *                   - หายใจเร็ว หายใจหอบเหนื่อย
+ *                 example: "หายใจปกติ"
+ *               extra_symptoms:
+ *                 type: string
+ *                 description: Additional symptoms (optional).
+ *                 example: "มีไข้, ไอ"
+ *               eat_method:
+ *                 type: string
+ *                 description: |
+ *                   Eating Method. Possible values:
+ *                   - รับประทานเองได้
+ *                   - ใส่สายยางให้อาหาร
+ *                 example: "รับประทานเองได้"
+ *               food_type:
+ *                 type: string
+ *                 description: |
+ *                   Food Type. Possible values:
+ *                   - นมแม่
+ *                   - นมผสม
+ *                   - อาหารปกติ
+ *                   - อาหารอ่อน
+ *                   - อาหารเหลว
+ *                 example: "อาหารปกติ"
+ *               extra_food:
+ *                 type: string
+ *                 description: Additional food information (optional).
+ *                 example: "ผักบด"
+ *               food_intake:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: Food Intake (multiple choice).
+ *                 example: ["ข้าว", "ผลไม้"]
+ *               sleep:
+ *                 type: string
+ *                 description: |
+ *                   Sleep Pattern. Possible values:
+ *                   - นอนหลับได้
+ *                   - หลับๆตื่นๆ
+ *                   - นอนไม่หลับ
+ *                 example: "นอนหลับได้"
+ *               excretion:
+ *                 type: string
+ *                 description: |
+ *                   Excretion. Possible values:
+ *                   - ดี
+ *                   - ไม่ดี
+ *                 example: "ดี"
+ *               notes:
+ *                 type: string
+ *                 description: Additional notes (optional).
+ *                 example: "ไม่มีอาการผิดปกติ"
+ *             required:
+ *               - HN
+ *               - BT
+ *               - BP
+ *               - HR
+ *               - RR
+ *               - O2sat
+ *               - conscious
+ *               - breath_pattern
+ *               - eat_method
+ *               - food_type
+ *               - food_intake
+ *               - sleep
+ *               - excretion
+ *     responses:
+ *       200:
+ *         description: Record added successfully
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: success
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: Error message
+ */
+
+// edit record
+/**
+ * @swagger
+ * /api/v1/patients/record:
+ *   put:
+ *     summary: Update a patient's record
+ *     description: Update an existing record for a patient using the Hospital Number (HN) and document ID (docId).
+ *     tags:
+ *       - Records
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               HN:
+ *                 type: string
+ *                 description: Hospital Number (HN) of the patient.
+ *                 example: 'AI12345'
+ *               docId:
+ *                 type: string
+ *                 description: Document ID of the record to update.
+ *                 example: 'rec_Fri Aug 09 2024 14:39:25 GMT+0700 (เวลาอินโดจีน)'
  *               BT:
  *                 type: string
  *                 description: Body Temperature.
@@ -325,26 +493,112 @@
  *                 example: "ไม่มีอาการผิดปกติ"
  *             required:
  *               - HN
- *               - BT
- *               - BP
- *               - HR
- *               - RR
- *               - O2sat
- *               - conscious
- *               - breath_pattern
- *               - eat_method
- *               - food_type
- *               - food_intake
- *               - sleep
- *               - excretion
+ *               - docId
  *     responses:
  *       200:
- *         description: Record added successfully
+ *         description: Record updated successfully.
+ *       500:
+ *         description: Internal server error.
+ */
+
+
+// delete record
+/**
+ * @swagger
+ * /api/v1/patients/record:
+ *   delete:
+ *     summary: Delete a patient's record
+ *     description: Delete an existing record from a patient's record collection using the Hospital Number (HN) and document ID (docId).
+ *     tags:
+ *       - Records
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               HN:
+ *                 type: string
+ *                 description: Hospital Number (HN) of the patient.
+ *                 example: 'AI12345'
+ *               docId:
+ *                 type: string
+ *                 description: Document ID of the record to delete.
+ *                 example: 'rec_Fri Aug 09 2024 14:39:25 GMT+0700 (เวลาอินโดจีน)'
+ *             required:
+ *               - HN
+ *               - docId
+ *     responses:
+ *       200:
+ *         description: Record deleted successfully.
+ *       500:
+ *         description: Internal server error.
+ */
+
+
+// get all records
+/**
+ * @swagger
+ * /api/v1/patients/record:
+ *   get:
+ *     summary: Find patients based on Hospital Number (HN)
+ *     description: Retrieves a list of patients based on the HN query parameter. If HN is not provided, the latest updated patients are returned.
+ *     tags:
+ *       - Records
+ *     parameters:
+ *       - in: query
+ *         name: HN
+ *         schema:
+ *           type: string
+ *           nullable: true
+ *         required: true
+ *         description: Hospital Number (HN) of the patient.
+ *         example: "AI12345"
+ *     responses:
+ *       200:
+ *         description: List of patients retrieved successfully
  *         content:
- *           text/plain:
+ *           application/json:
  *             schema:
- *               type: string
- *               example: success
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     description: The document ID of the patient in Firestore.
+ *                     example: abc123
+ *                   HN:
+ *                     type: string
+ *                     description: Hospital Number of the patient.
+ *                     example: 12345
+ *                   prefix:
+ *                     type: string
+ *                     description: Prefix of the patient's name.
+ *                     example: Mr.
+ *                   name:
+ *                     type: string
+ *                     description: First name of the patient.
+ *                     example: John
+ *                   surname:
+ *                     type: string
+ *                     description: Surname of the patient.
+ *                     example: Doe
+ *                   gender:
+ *                     type: string
+ *                     description: Gender of the patient.
+ *                     example: Male
+ *                   DOB:
+ *                     type: string
+ *                     format: date
+ *                     description: Date of birth of the patient.
+ *                     example: 1990-01-01
+ *                   lastUpdate:
+ *                     type: string
+ *                     format: date-time
+ *                     description: The timestamp of the last update for the patient record.
+ *                     example: 2024-08-08T12:34:56Z
  *       500:
  *         description: Internal server error
  *         content:
@@ -353,14 +607,6 @@
  *               type: string
  *               example: Error message
  */
-
-// edit record
-
-
-// delete record
-
-
-// get all records
 
 
 // ------- USERS SECTION -------------------------------------- //
@@ -473,4 +719,41 @@
  *             schema:
  *               type: string
  *               example: Error message
+ */
+
+// edit user 
+
+
+// delete user
+/**
+ * @swagger
+ * /api/v1/users/delete:
+ *   delete:
+ *     summary: Delete a user
+ *     description: Delete 
+ *     tags:
+ *       - Users
+ *     requestBody:
+ *       required: true
+ *       content:
+*         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: Username of the organization account.
+ *                 example: "johndoe"
+ *               password:
+ *                 type: string
+ *                 description: Password of the organization account.
+ *                 example: "securepassword123"
+ *             required:
+ *               - username
+ *               - password
+ *     responses:
+ *       200:
+ *         description: user deleted successfully.
+ *       500:
+ *         description: Internal server error.
  */

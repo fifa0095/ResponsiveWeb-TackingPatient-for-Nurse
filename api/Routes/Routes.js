@@ -31,11 +31,13 @@ router.delete('/patients/delete', formController.DelPatient);
 
 router.post('/patients/record', formController.AddRecord);
 router.put('/patients/record', formController.EditRecord);
-router.get('/patients/', formController.GetRecord);
+router.get('/patients/record', formController.GetRecord);
 router.delete('/patients/record', formController.DelRecord);
 
 
 router.post('/users/register', userController.create);
 router.post('/users/login', userController.login);
+router.put('/users/update', userController.edit);
+router.delete('/users/delete', userController.del);
 
 module.exports = router

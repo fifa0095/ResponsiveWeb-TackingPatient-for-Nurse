@@ -161,7 +161,14 @@ const FindPatient = async (req, res) => {
 // delete patient info
 const DelPatient = async (req, res ) => {
   try {
-      
+    const requiredFields = [
+      'HN', 
+    ];
+    checkfield(requiredFields, req);
+
+    await db.collection('patients').doc(req.body.HN).delete();
+    res.status(200).send("delete success");
+
   } catch (error) {
     res.status(500).send(error.message);
   }
@@ -214,7 +221,7 @@ const AddRecord = async (req, res) => {
 
     await db.collection('patients').doc(req.body.HN).collection('records').doc(docId).set(recordData);
 
-    res.status(200).send('Record added successfully');
+    res.status(200).send(docId);
   } catch (error) {
     res.status(500).send(error.message);
   }
@@ -225,7 +232,21 @@ const AddRecord = async (req, res) => {
 // edit record
 const EditRecord = async (req, res ) => {
   try {
-      
+    const requiredFields = [
+      'HN',                    // Hospital Number
+      'docId'                 // docId in 
+    ];
+
+    checkfield(requiredFields, req);
+
+    const HN = req.body.HN;
+    const Id = req.body.docId;
+    delete req.body.HN;
+    delete req.body.docId;
+
+    await db.collection('patients').doc(HN).collection('records').doc(Id).update(req.body);
+
+    res.status(200).send("edit success");
   } catch (error) {
     res.status(500).send(error.message);
   }
@@ -234,7 +255,15 @@ const EditRecord = async (req, res ) => {
 // delete record
 const DelRecord = async (req, res ) => {
   try {
-      
+    const requiredFields = [
+      'HN', 
+      'docId',                    // Hospital Number
+    ];
+    checkfield(requiredFields, req);
+
+    await db.collection('patients').doc(req.body.HN).collection('records').doc(req.body.Id).delete();
+    res.status(200).send("delete success");
+
   } catch (error) {
     res.status(500).send(error.message);
   }
@@ -243,7 +272,29 @@ const DelRecord = async (req, res ) => {
 // get all records
 const GetRecord = async (req, res ) => {
   try {
-      
+      const { HN } = req.query;
+      let patientsRef = db.collection('patients');
+      let snapshot;
+
+      if (!HN) {
+        // Default search: Fetch random data ordered by the latest update
+        res.status(404).send("No HN record found")
+      } else {
+        // Search with the HN parameter
+        snapshot = await patientsRef.doc(HN).collection('records').get();
+      }
+
+      const records = [];
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        // Convert Firestore timestamp fields to JavaScript Date
+        if (data.timestamp) {
+          data.timestamp = firestoreTimestampToDateInUTCPlus7(data.timestamp, 'date');
+        }
+        records.push({ id: doc.id, ...data });
+      });
+
+      res.status(200).json(records);
   } catch (error) {
     res.status(500).send(error.message);
   }
