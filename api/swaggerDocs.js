@@ -542,8 +542,8 @@
  * @swagger
  * /api/v1/patients/record:
  *   get:
- *     summary: Find patients based on Hospital Number (HN)
- *     description: Retrieves a list of patients based on the HN query parameter. If HN is not provided, the latest updated patients are returned.
+ *     summary: Retrieve patient records by HN
+ *     description: Fetch all records associated with a patient's HN (Hospital Number). If HN is not provided, a 404 error will be returned.
  *     tags:
  *       - Records
  *     parameters:
@@ -551,13 +551,12 @@
  *         name: HN
  *         schema:
  *           type: string
- *           nullable: true
+ *           example: "AI123456"
  *         required: true
- *         description: Hospital Number (HN) of the patient.
- *         example: "AI12345"
+ *         description: The Hospital Number (HN) of the patient whose records you want to retrieve.
  *     responses:
  *       200:
- *         description: List of patients retrieved successfully
+ *         description: A list of patient records
  *         content:
  *           application/json:
  *             schema:
@@ -567,45 +566,64 @@
  *                 properties:
  *                   id:
  *                     type: string
- *                     description: The document ID of the patient in Firestore.
- *                     example: abc123
- *                   HN:
+ *                     description: The ID of the record.
+ *                     example: "rec_Fri Aug 09 2024 14:39:25 GMT+0700 (เวลาอินโดจีน)"
+ *                   RR:
  *                     type: string
- *                     description: Hospital Number of the patient.
- *                     example: 12345
- *                   prefix:
+ *                     example: "ปกติ"
+ *                   extra_food:
  *                     type: string
- *                     description: Prefix of the patient's name.
- *                     example: Mr.
- *                   name:
+ *                     example: "ผักบด"
+ *                   notes:
  *                     type: string
- *                     description: First name of the patient.
- *                     example: John
- *                   surname:
+ *                     example: "ไม่มีอาการผิดปกติ"
+ *                   HR:
  *                     type: string
- *                     description: Surname of the patient.
- *                     example: Doe
- *                   gender:
+ *                     example: "ปกติ"
+ *                   breath_pattern:
  *                     type: string
- *                     description: Gender of the patient.
- *                     example: Male
- *                   DOB:
+ *                     example: "หายใจปกติ"
+ *                   food_type:
  *                     type: string
- *                     format: date
- *                     description: Date of birth of the patient.
- *                     example: 1990-01-01
- *                   lastUpdate:
+ *                     example: "อาหารปกติ"
+ *                   extra_symptoms:
+ *                     type: string
+ *                     example: "มีไข้, ไอ"
+ *                   eat_method:
+ *                     type: string
+ *                     example: "รับประทานเองได้"
+ *                   BP:
+ *                     type: string
+ *                     example: "ปกติ"
+ *                   sleep:
+ *                     type: string
+ *                     example: "นอนหลับได้"
+ *                   BT:
+ *                     type: string
+ *                     example: "ไม่มีไข้"
+ *                   O2sat:
+ *                     type: string
+ *                     example: "ปกติ"
+ *                   excretion:
+ *                     type: string
+ *                     example: "ดี"
+ *                   food_intake:
+ *                     type: array
+ *                     items:
+ *                       type: string
+ *                     example: ["ข้าว", "ผลไม้"]
+ *                   conscious:
+ *                     type: string
+ *                     example: "ตื่น รู้สึกตัวดี"
+ *                   timestamp:
  *                     type: string
  *                     format: date-time
- *                     description: The timestamp of the last update for the patient record.
- *                     example: 2024-08-08T12:34:56Z
+ *                     description: The timestamp of the record in UTC+7.
+ *                     example: "2024-08-11T14:39:25.853Z"
+ *       404:
+ *         description: No HN record found
  *       500:
  *         description: Internal server error
- *         content:
- *           text/plain:
- *             schema:
- *               type: string
- *               example: Error message
  */
 
 
@@ -757,3 +775,43 @@
  *       500:
  *         description: Internal server error.
  */
+
+
+// ---------
+
+// general info random pic
+/**
+ * @swagger
+ * /api/v1/line/general-info:
+ *   get:
+ *     summary: Retrieve a random file URL from a specific folder in Google Cloud Storage.
+ *     description: This endpoint lists all files in a specified folder within a Google Cloud Storage bucket, selects a random file, makes it public, and returns its public URL.
+ *     tags: 
+ *       - Files
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved the public URL of a random file.
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: https://storage.googleapis.com/your-bucket-name/path/to/random-file.jpg
+ *       404:
+ *         description: No files found in the specified folder.
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: No files found in the specified folder.
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Error reading file
+ */
+  

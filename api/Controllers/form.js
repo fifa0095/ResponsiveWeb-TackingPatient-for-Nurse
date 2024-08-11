@@ -1,4 +1,4 @@
-const  { db, admin } = require('../config_db/firebaseConfig');
+const  { db, admin , bucket , storage} = require('../config_db/firebaseConfig');
 const crypto = require('crypto');
 const Timestamp = admin.firestore.Timestamp;
 
@@ -300,6 +300,35 @@ const GetRecord = async (req, res ) => {
   }
 }
 
+const readfile = async (req, res) => {
+  try {
+    // List all files in the specified folder within the bucket
+    const [files] = await storage.bucket('i-care-u.appspot.com').getFiles({
+      prefix: 'general_info/',
+    });
+
+    // Filter out any entries that are not actual files (e.g., directories)
+    const actualFiles = files.filter(file => !file.name.endsWith('/'));
+
+    if (actualFiles.length === 0) {
+      return res.status(404).send('No files found in the specified folder.');
+    }
+
+    // Select a random file from the list of actual files
+    const randomFile = actualFiles[Math.floor(Math.random() * actualFiles.length)];
+    console.log(`Selected random file: ${randomFile.name}`);
+
+    // Make the file public and get its URL
+    await randomFile.makePublic();
+    const url = randomFile.publicUrl();
+
+    res.status(200).send(url);
+  } catch (error) {
+    console.error('Error reading file', error);
+    res.status(500).send({ error: error.message });
+  }
+};
+
 //template
 // const functionname = async (req, res ) => {
 //   try {
@@ -309,5 +338,5 @@ const GetRecord = async (req, res ) => {
 //   }
 // }
 module.exports = { AddPatient, EditPatient, FindPatient , DelPatient ,
-                    AddRecord, EditRecord, DelRecord, GetRecord
+                    AddRecord, EditRecord, DelRecord, GetRecord , readfile
 };

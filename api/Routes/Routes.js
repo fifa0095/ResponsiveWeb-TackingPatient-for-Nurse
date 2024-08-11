@@ -40,4 +40,5 @@ router.post('/users/login', userController.login);
 router.put('/users/update', userController.edit);
 router.delete('/users/delete', userController.del);
 
+router.get('/line/general-info' , formController.readfile)
 module.exports = router
