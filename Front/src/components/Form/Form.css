@@ -1,0 +1,69 @@
+.container-form {
+  padding: 20px;
+  width: 100%;
+  position: relative;
+  /* max-width: 1200px; */
+  width: 100%;
+  background: #fff;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  color: #707070;
+}
+
+.input-box {
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+fieldset {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+legend {
+  font-weight: bold;
+}
+
+input[type="radio"] {
+  margin-right: 5px;
+}
+
+input[type="text"], 
+textarea, 
+select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+}
+
+button {
+  padding: 10px 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.submitted-data {
+  margin-top: 20px;
+}
+
+.submitted-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.submitted-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+.column{
+  display: flex;
+  justify-content: space-between;
+}
