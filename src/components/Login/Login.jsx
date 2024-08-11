@@ -5,18 +5,16 @@ import avatar from "../../imgs/avatar.svg";
 import blob from "../../imgs/blob.svg";
 import bg from "../../imgs/bg.svg";
 
-const Login = () => {
+const Login = ({ onLogin }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
   const handleLogin = (e) => {
     e.preventDefault();
-    // Simple authentication for demonstration
+    onLogin({ username, password });
     if (username === 'admin' && password === 'password') {
       navigate("/main");
-    } else {
-      alert("Invalid credentials");
     }
   };
 

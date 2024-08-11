@@ -14,8 +14,8 @@
 .App {
   color: var(--black);
   background: white;
-  height: 100%;
-  width: 90vw;
+  height: 97vh; /* Full viewport height */
+  width: 97vw; /* Full viewport width */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -24,32 +24,33 @@
 
 .AppGlass {
   display: grid;
-  height: 97%;
-  width: 97%;
+  height: 90vh; /* Adjust to fit content */
+  width: 90vw; /* Adjust to fit content */
   border-radius: 2rem;
   gap: 50px;
-  grid-template-columns: 12rem auto;
+  grid-template-columns: 12rem auto; /* Sidebar and content */
+ /* background: #000; */
+  height: 100vh;
   overflow: hidden;
 }
 
 .MainContent {
-  width: 97%;
-  height: 90%;
-  margin-top: 10vh;
+  width: 100%;
+  height: 100%; /* Full height of the container */
+  margin-top: 0; /* Remove margin for proper alignment */
 }
 
 /* Responsive for screens smaller than 1200px */
 @media screen and (max-width: 1200px) {
   .AppGlass {
     grid-template-columns: 20% auto;
-    overflow-y: auto; /* Improved scrolling behavior */
-    gap: 30px; /* Reduce the gap between columns */
+    overflow-y: auto; 
+    gap: 30px; /* Reduce gap between columns */
   }
 
   .MainContent {
-    margin-top: 5vh; /* Adjust margin for smaller screens */
-    width: 95%;
-    height: 85%;
+    width: 100%; /* Full width */
+    height: auto; /* Adjust height automatically */
   }
 }
 
@@ -62,15 +63,15 @@
 
   .AppGlass {
     grid-template-columns: 1fr; /* Single column layout */
-    grid-template-rows: auto 1fr; /* Adjust to place content below the sidebar */
+    grid-template-rows: auto 1fr; /* Stack sidebar and content */
     height: 100%;
     width: 100%;
-    gap: 20px; /* Further reduce the gap for smaller screens */
+    gap: 20px; /* Reduce gap */
   }
 
   .MainContent {
     width: 100%;
-    height: auto;
+    height: auto; /* Adjust height automatically */
     margin-top: 0;
   }
 }
@@ -78,18 +79,15 @@
 /* Responsive for screens smaller than 480px (mobile) */
 @media screen and (max-width: 480px) {
   .App {
-    width: 100vw;
     padding: 0 5px; /* Further reduce padding for small devices */
   }
 
   .AppGlass {
-    gap: 10px; /* Minimal gap for very small screens */
-    border-radius: 1rem; /* Smaller border radius for mobile */
+    gap: 10px; /* Minimal gap */
+    border-radius: 1rem; /* Smaller border radius */
   }
 
   .MainContent {
-    margin-top: 0;
-    width: 100%;
     padding: 0 10px; /* Add padding to main content */
   }
 }
