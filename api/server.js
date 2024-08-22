@@ -46,22 +46,31 @@ app.post('/api/webhook', async (req, res) => {
             try {
 
                 if (userStates[userId]) delete userStates[userId];
-                const imageUrl = await axios.get('http://localhost:3000/api/v1/line/general-info');
+                const resImg = await axios.get('https://icareu.vercel.app/api/v1/line/general-info');
+                const imageUrl = resImg.data.imageUrl;
                 // const imageUrl = response.data; // Assuming the API returns a URL of an image
-                responseMessage = { type: 'image', originalContentUrl: imageUrl, previewImageUrl: imageUrl };
+                const responseMessage = { type: 'image', originalContentUrl: imageUrl, previewImageUrl: imageUrl };
               // const imageUrl = 'https://www.prydwen.gg/static/4d91060488554694e8c1ec47c078db4a/b26e2/17_card.webp'
+                console.log('message->> ', responseMessage)
 
-              return await axios.post('https://api.line.me/v2/bot/message/reply', {
+              await axios.post('https://api.line.me/v2/bot/message/reply', {
                 replyToken,
-                messages: [
-                  { type: 'image', originalContentUrl: imageUrl, previewImageUrl: imageUrl  } // Send response back to LINE
-                ]
+                messages: [responseMessage]
               }, {
                 headers: { Authorization: `Bearer ${lineConfig.channelAccessToken}` }
               });
 
+              return res.status(200).end();
             } catch (error) {
-              responseMessage = 'Failed to fetch data';
+              console.error('Error sending image:', error); // Log any error
+              const responseMessage = { type: 'text', text: 'เกิดข้อผิดพลาดในขณะนี้ กรุณาลองใหม่อีกครั้ง ขออภัยในความไม่สะดวกค่ะ' };
+              await axios.post('https://api.line.me/v2/bot/message/reply', {
+                replyToken,
+                messages: [responseMessage]
+              }, {
+                headers: { Authorization: `Bearer ${lineConfig.channelAccessToken}` }
+              });
+              return res.status(200).end();
             }
           } else if (messageText === 'ติดต่อ') {
             if (userStates[userId]) delete userStates[userId];
@@ -71,7 +80,7 @@ app.post('/api/webhook', async (req, res) => {
                 altText: 'Contact us',
                 template: {
                   type: 'buttons',
-                  text: 'ติดต่อได้ที่ ' + phoneNumber + ' (เวลาราชการ)',
+                  text: 'ติดต่อได้ที่ ' + phoneNumber + ' (เวลาราชการเท่านั้น)',
                   actions: [
                     {
                       type: 'uri',
@@ -82,12 +91,14 @@ app.post('/api/webhook', async (req, res) => {
                 }
               };
 
-              return await axios.post('https://api.line.me/v2/bot/message/reply', {
+              await axios.post('https://api.line.me/v2/bot/message/reply', {
                 replyToken,
                 messages: [responseMessage]
               }, {
                 headers: { Authorization: `Bearer ${lineConfig.channelAccessToken}` }
               });
+
+              return res.status(200).end();
 
           } else if (userStates[userId] && userStates[userId] === 'awaitingHN') {
             // User has responded with their HN
@@ -96,7 +107,7 @@ app.post('/api/webhook', async (req, res) => {
             // Process the HN (you might want to perform some validation here)
             console.log(`Received HN: ${hnCode} from user ${userId}`);
 
-            const patient = await axios.get('http://localhost:3000/api/v1/patients/get', {
+            const patient = await axios.get('https://icareu.vercel.app/api/v1/patients/get', {
               params: {
                 HN: hnCode
               }
@@ -107,7 +118,7 @@ app.post('/api/webhook', async (req, res) => {
 
             if(patientData == 'undefined' || patientData == null)
             {
-              return await axios.post('https://api.line.me/v2/bot/message/reply', {
+              await axios.post('https://api.line.me/v2/bot/message/reply', {
                 replyToken,
                 messages: [
                   { type: 'text', text: 'ขออภัยค่ะ ไม่พบข้อมูลประวัติผู้ป่วย หรือรหัสประจำตัวผู้ป่วยไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง' } // Confirm receipt of the HN
@@ -115,16 +126,17 @@ app.post('/api/webhook', async (req, res) => {
               }, {
                 headers: { Authorization: `Bearer ${lineConfig.channelAccessToken}` }
               });
+              return res.status(200).end();
             }else{
 
-              const response = await axios.get('http://localhost:3000/api/v1/patients/record', {
+              const response = await axios.get('https://icareu.vercel.app/api/v1/patients/record', {
                 params: {
                   HN: hnCode
                 }
               });
   
               console.log(response.data);
-              if( response.data == null) 
+              if( response.data != null) 
               {
 
                 const records = response.data;
@@ -132,7 +144,7 @@ app.post('/api/webhook', async (req, res) => {
               // Sort the records by timestamp in descending order and get the latest one
               const latestRecord = records.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
               let foodIntakeStr = ' '
-              if( latestRecord.food_intake === unll || latestRecord.food_intake === 'undefined')
+              if( latestRecord.food_intake == null || latestRecord.food_intake == 'undefined')
               foodIntakeStr = latestRecord.food_intake.length > 0 ? latestRecord.food_intake.join(', ') : ' ';
   
               const latestRecordMessage = `
@@ -165,8 +177,24 @@ app.post('/api/webhook', async (req, res) => {
                 headers: { Authorization: `Bearer ${lineConfig.channelAccessToken}` }
               });
 
-            }
+              return res.status(200).end();
 
+              }else{
+
+                delete userStates[userId];
+  
+                const responseMessage = { type: 'text', text: 'เกิดข้อผิดพลาดในขณะนี้ กรุณาลองใหม่อีกครั้ง ขออภัยในความไม่สะดวกค่ะ' };
+
+                // Send confirmation message
+                await axios.post('https://api.line.me/v2/bot/message/reply', {
+                  replyToken,
+                  messages: [ responseMessage]
+                }, {
+                  headers: { Authorization: `Bearer ${lineConfig.channelAccessToken}` }
+                });
+
+                return res.status(200).end();
+              }
             }
             
 
@@ -188,10 +216,13 @@ app.post('/api/webhook', async (req, res) => {
   
  
         }
+        else{
+          return res.status(200).end();
+        }
       }
   
       // Respond to LINE to confirm receipt
-      res.status(200).send('Webhook received');
+      return res.status(200).send('Webhook received');
     } catch (error) {
       console.error('Error handling webhook:', error);
       res.status(500).end();
